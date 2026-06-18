@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <springProperty scope="context" name="SERVICE_NAME"
+                    source="spring.application.name" defaultValue="user-service"/>
+
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [${SERVICE_NAME}] [%thread] %logger{40} reqId=%X{requestId} userId=%X{userId} - %msg%n</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+
+    <!-- Application code -->
+    <logger name="com.singhdevhub.userservice" level="INFO"/>
+
+    <!-- Flyway: show migration progress -->
+    <logger name="org.flywaydb" level="INFO"/>
+
+    <!-- Third-party frameworks: WARN to suppress debug noise in production -->
+    <logger name="org.springframework.security"  level="WARN"/>
+    <logger name="org.springframework.web"        level="WARN"/>
+    <logger name="org.springframework.kafka"      level="WARN"/>
+    <logger name="org.apache.kafka"               level="WARN"/>
+    <logger name="org.hibernate.SQL"              level="WARN"/>
+    <logger name="org.hibernate.type"             level="WARN"/>
+    <logger name="com.zaxxer.hikari"              level="WARN"/>
+
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+    </root>
+
+</configuration>
