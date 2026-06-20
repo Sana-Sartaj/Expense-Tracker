@@ -58,6 +58,8 @@ public class ExpenseService
         expense.setAmount(expenseDto.getAmount());
         expense.setMerchant(Strings.isNotBlank(expenseDto.getMerchant())?expenseDto.getMerchant():expense.getMerchant());
         expense.setCurrency(Strings.isNotBlank(expenseDto.getCurrency())?expenseDto.getCurrency():expense.getCurrency());
+        if (expenseDto.getCategory() != null) expense.setCategory(expenseDto.getCategory());
+        if (expenseDto.getTransactionType() != null) expense.setTransactionType(expenseDto.getTransactionType());
         expenseRepository.save(expense);
         return true;
     }

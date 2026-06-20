@@ -15,9 +15,9 @@ export const loginApi = async (data: LoginRequest): Promise<LoginResponse> => {
 };
 
 // ── POST /auth/v1/signup ─────────────────────────────────────────
-// Returns the new userId as a plain string ("Already Exist" on conflict)
-export const registerApi = async (data: RegisterRequest): Promise<string> => {
-  const res = await apiClient.post<string>('/auth/v1/signup', data);
+// Returns JwtResponseDTO (accessToken, token, userId) on success; throws on conflict (400)
+export const registerApi = async (data: RegisterRequest): Promise<LoginResponse> => {
+  const res = await apiClient.post<LoginResponse>('/auth/v1/signup', data);
   return res.data;
 };
 

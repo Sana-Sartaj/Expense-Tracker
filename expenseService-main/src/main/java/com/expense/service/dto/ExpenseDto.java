@@ -51,6 +51,12 @@ public class ExpenseDto
     @JsonProperty(value = "created_at")
     private Timestamp createdAt;
 
+    @JsonProperty(value = "category")
+    private String category;
+
+    @JsonProperty(value = "transaction_type")
+    private String transactionType;
+
     public ExpenseDto(String json) {
         try {
             ObjectMapper mapper = new ObjectMapper();

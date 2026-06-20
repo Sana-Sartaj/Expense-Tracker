@@ -54,6 +54,18 @@ const MoreScreen: React.FC<Props> = ({ navigation }) => {
 
   const menuSections: { title: string; items: MenuItem[] }[] = [
     {
+      title: 'Smart Tools',
+      items: [
+        {
+          id: 'smartadd',
+          icon: 'sparkles-outline',
+          label: 'Smart Import',
+          subtitle: 'Paste a bank SMS — AI extracts the expense',
+          onPress: () => navigation.navigate('SmartAdd'),
+        },
+      ],
+    },
+    {
       title: 'Finance',
       items: [
         {
@@ -94,7 +106,7 @@ const MoreScreen: React.FC<Props> = ({ navigation }) => {
   ];
 
   const displayName = profile
-    ? `${profile.firstName} ${profile.lastName}`.trim()
+    ? `${profile.first_name} ${profile.last_name}`.trim()
     : 'User';
 
   return (

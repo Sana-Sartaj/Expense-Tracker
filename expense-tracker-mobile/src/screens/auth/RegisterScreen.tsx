@@ -14,7 +14,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useMutation } from '@tanstack/react-query';
 
 import { AuthStackParamList } from '../../types';
-import { registerApi, loginApi, createUserProfileApi } from '../../api/authApi';
+import { registerApi, createUserProfileApi } from '../../api/authApi';
 import { useAuthStore } from '../../store/authStore';
 import COLORS from '../../constants/colors';
 import Button from '../../components/Button';
@@ -28,6 +28,7 @@ interface FormState {
   firstName: string;
   lastName: string;
   email: string;
+  phoneNumber: string;
   username: string;
   password: string;
   confirmPassword: string;
@@ -37,6 +38,7 @@ const INITIAL: FormState = {
   firstName: '',
   lastName: '',
   email: '',
+  phoneNumber: '',
   username: '',
   password: '',
   confirmPassword: '',
@@ -59,6 +61,8 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
     if (!form.lastName.trim()) e.lastName = 'Required';
     if (!form.email.trim()) e.email = 'Required';
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) e.email = 'Invalid email';
+    if (!form.phoneNumber.trim()) e.phoneNumber = 'Required';
+    else if (!/^\d{7,15}$/.test(form.phoneNumber.trim())) e.phoneNumber = 'Enter a valid phone number';
     if (!form.username.trim()) e.username = 'Required';
     else if (form.username.trim().length < 3) e.username = 'Min 3 characters';
     if (!form.password) e.password = 'Required';
@@ -74,43 +78,31 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
     if (!validate()) return;
     setIsProcessing(true);
     try {
-      // Step 1: create auth account
+      // Step 1: create auth account — response already contains JWT tokens
       const signupResult = await registerApi({
         username: form.username.trim(),
         password: form.password,
-        firstName: form.firstName.trim(),
-        lastName: form.lastName.trim(),
+        first_name: form.firstName.trim(),
+        last_name: form.lastName.trim(),
         email: form.email.trim(),
-        phoneNumber: 0,
+        phone_number: parseInt(form.phoneNumber.trim(), 10),
       });
 
-      if (signupResult === 'Already Exist') {
-        Alert.alert('Registration Failed', 'This username is already taken. Please choose another.');
-        setIsProcessing(false);
-        return;
-      }
+      const userId = signupResult.userId ?? 'unknown';
 
-      // Step 2: auto-login to get tokens
-      const loginResult = await loginApi({
-        username: form.username.trim(),
-        password: form.password,
-      });
-
-      const userId = loginResult.userId ?? 'unknown';
-
-      // Step 3: create user profile (best-effort, non-blocking)
+      // Step 2: create user profile (best-effort, non-blocking)
       createUserProfileApi({
-        userId,
-        firstName: form.firstName.trim(),
-        lastName: form.lastName.trim(),
+        user_id: userId,
+        first_name: form.firstName.trim(),
+        last_name: form.lastName.trim(),
         email: form.email.trim(),
-        phoneNumber: 0,
+        phone_number: parseInt(form.phoneNumber.trim(), 10),
       }).catch(() => {
         // Profile creation failing is non-fatal
       });
 
-      // Step 4: set auth state → AppNavigator switches to MainNavigator
-      login(loginResult.accessToken, loginResult.token, userId);
+      // Step 3: set auth state → AppNavigator switches to MainNavigator
+      login(signupResult.accessToken, signupResult.token, userId);
     } catch (error) {
       Alert.alert('Registration Failed', (error as Error).message);
     } finally {
@@ -173,6 +165,16 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
             autoCorrect={false}
             leftIcon="mail-outline"
             error={errors.email}
+          />
+
+          <Input
+            label="Phone Number"
+            placeholder="e.g. 9876543210"
+            value={form.phoneNumber}
+            onChangeText={set('phoneNumber')}
+            keyboardType="phone-pad"
+            leftIcon="call-outline"
+            error={errors.phoneNumber}
           />
 
           <Input

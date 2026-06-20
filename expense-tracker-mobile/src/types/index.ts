@@ -19,10 +19,10 @@ export interface LoginResponse {
 export interface RegisterRequest {
   username: string;
   password: string;
-  firstName: string;
-  lastName: string;
+  first_name: string;
+  last_name: string;
   email: string;
-  phoneNumber: number;
+  phone_number: number;
 }
 
 /** Sent to POST /auth/v1/refreshToken */
@@ -38,12 +38,12 @@ export interface RefreshTokenResponse {
 
 /** Sent to / returned from POST /user/v1/createUpdate */
 export interface UserProfile {
-  userId: string;
-  firstName: string;
-  lastName: string;
-  phoneNumber: number;
+  user_id: string;
+  first_name: string;
+  last_name: string;
+  phone_number: number;
   email: string;
-  profilePic?: string;
+  profile_pic?: string;
 }
 
 /**
@@ -132,6 +132,7 @@ export type MoreStackParamList = {
   MoreMenu: undefined;
   Categories: undefined;
   Budget: undefined;
+  SmartAdd: undefined;
 };
 
 // ─────────────────────────────────────────────

@@ -1,0 +1,43 @@
+# ── Secrets ──────────────────────────────────────────────────────
+.env
+.env.*
+!.env.example
+
+# ── Logs ─────────────────────────────────────────────────────────
+*.log
+logs/
+
+# ── Docker local state ───────────────────────────────────────────
+docker-compose.override.yml
+
+# ── OS ───────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+
+# ── IDE ──────────────────────────────────────────────────────────
+.idea/
+*.iml
+.vscode/settings.json
+
+# ── Java / Gradle builds ─────────────────────────────────────────
+**/build/
+**/.gradle/
+**/bin/
+**/*.class
+**/*.jar
+!**/gradlew.jar
+
+# ── Python ───────────────────────────────────────────────────────
+**/__pycache__/
+**/*.pyc
+**/*.pyo
+**/.venv/
+**/venv/
+
+# ── Node / Expo ──────────────────────────────────────────────────
+expense-tracker-mobile/node_modules/
+expense-tracker-mobile/.expo/
+expense-tracker-mobile/dist/
+expense-tracker-mobile/.env
+expense-tracker-mobile/.env.*
+!expense-tracker-mobile/.env.example

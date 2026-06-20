@@ -1,13 +1,7 @@
 import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
 import { useAuthStore } from '../store/authStore';
 
-/**
- * Change this to your Kong gateway address.
- * • Emulator (Android): http://10.0.2.2:8000
- * • Physical device:    http://<your-PC-IP>:8000
- * • Expo Go tunnel:     use your machine's LAN IP
- */
-export const BASE_URL = 'http://10.0.2.2:8000';
+export const BASE_URL = process.env.EXPO_PUBLIC_API_URL ?? 'http://10.198.232.23:8000';
 
 const apiClient = axios.create({
   baseURL: BASE_URL,

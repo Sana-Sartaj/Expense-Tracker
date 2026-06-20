@@ -1,10 +1,8 @@
 -- Baseline schema for the ExpenseService.
 --
 -- Schema is derived from the Expense entity (com.expense.service.entities.Expense).
--- GenerationType.AUTO on MySQL + Hibernate 6 uses SequenceStyleGenerator in table
--- mode — the id column is a plain BIGINT fed by the hibernate_sequence table, NOT
--- an AUTO_INCREMENT column. Using AUTO_INCREMENT here would conflict with Hibernate's
--- table-based sequence at runtime.
+-- V4 migration alters id to AUTO_INCREMENT and drops hibernate_sequence once this
+-- baseline has been applied (handles both fresh installs and existing databases).
 
 CREATE TABLE IF NOT EXISTS expense (
     id          BIGINT       NOT NULL,

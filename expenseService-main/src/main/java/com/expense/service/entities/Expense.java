@@ -34,7 +34,7 @@ public class Expense
 
     @Id
     @Column(name = "id")
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "external_id")
@@ -54,6 +54,12 @@ public class Expense
 
     @JsonProperty(value = "created_at")
     private Timestamp createdAt;
+
+    @Column(name = "category")
+    private String category;
+
+    @Column(name = "transaction_type")
+    private String transactionType;
 
     @Column(name = "is_deleted", nullable = false)
     private boolean deleted;

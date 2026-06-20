@@ -1,67 +1,107 @@
 import apiClient from './client';
-import { Transaction, TransactionRequest } from '../types';
+import { Transaction, TransactionRequest, TransactionType } from '../types';
 
-// ── POST /expense/v1/add ─────────────────────────────────────────
-export const addTransactionApi = async (
-  data: TransactionRequest,
-): Promise<Transaction> => {
-  const res = await apiClient.post<Transaction>('/expense/v1/add', data);
+// Snake_case shape returned by the backend
+interface BackendExpense {
+  external_id: string;
+  amount: number;
+  user_id: string;
+  merchant: string;
+  currency: string;
+  created_at?: string;
+  category?: string;
+  transaction_type?: string;
+}
+
+interface PagedExpenseResponse {
+  items: BackendExpense[];
+  page: number;
+  size: number;
+  total_elements: number;
+  total_pages: number;
+}
+
+function toTransaction(e: BackendExpense): Transaction {
+  return {
+    externalId: e.external_id,
+    userId: e.user_id,
+    merchant: e.merchant,
+    amount: Number(e.amount),
+    currency: e.currency,
+    category: e.category ?? '',
+    date: e.created_at ? e.created_at.split('T')[0] : '',
+    transactionType: (e.transaction_type as TransactionType) ?? 'EXPENSE',
+  };
+}
+
+// ── POST /expense/v1/addExpense ──────────────────────────────────
+export const addExpenseApi = async (data: TransactionRequest): Promise<boolean> => {
+  const res = await apiClient.post<boolean>(
+    '/expense/v1/addExpense',
+    {
+      amount: data.amount,
+      merchant: data.merchant,
+      currency: data.currency,
+      category: data.category,
+      transaction_type: data.transactionType,
+    },
+    { headers: { 'X-User-Id': data.userId } },
+  );
   return res.data;
 };
 
-// ── GET /expense/v1/{userId} ─────────────────────────────────────
-export const getTransactionsApi = async (
-  userId: string,
-): Promise<Transaction[]> => {
-  const res = await apiClient.get<Transaction[]>(`/expense/v1/${userId}`);
-  // Normalise: ensure transactionType exists (backend may omit it)
-  return (res.data ?? []).map(normalise);
+// ── PUT /expense/v1/updateExpense ────────────────────────────────
+export const updateExpenseApi = async (data: TransactionRequest): Promise<boolean> => {
+  const res = await apiClient.put<boolean>(
+    '/expense/v1/updateExpense',
+    {
+      external_id: data.externalId,
+      amount: data.amount,
+      merchant: data.merchant,
+      currency: data.currency,
+      category: data.category,
+      transaction_type: data.transactionType,
+    },
+    { headers: { 'X-User-Id': data.userId } },
+  );
+  return res.data;
 };
 
-// ── GET /expense/v1/{userId}/{start}/{end} ───────────────────────
+// ── GET /expense/v1/getExpense ───────────────────────────────────
+export const getTransactionsApi = async (userId: string): Promise<Transaction[]> => {
+  const res = await apiClient.get<PagedExpenseResponse>(
+    '/expense/v1/getExpense',
+    { headers: { 'X-User-Id': userId } },
+  );
+  return (res.data?.items ?? []).map(toTransaction);
+};
+
+// alias used by multiple screens
+export const getExpensesApi = getTransactionsApi;
+
+// ── GET /expense/v1/getExpenseByDateRange ────────────────────────
 export const getTransactionsByRangeApi = async (
   userId: string,
-  start: string,  // "YYYY-MM-DD"
-  end: string,    // "YYYY-MM-DD"
+  startDate: number,
+  endDate: number,
 ): Promise<Transaction[]> => {
-  const res = await apiClient.get<Transaction[]>(
-    `/expense/v1/${userId}/${start}/${end}`,
+  const res = await apiClient.get<BackendExpense[]>(
+    '/expense/v1/getExpenseByDateRange',
+    {
+      headers: { 'X-User-Id': userId },
+      params: { startDate, endDate },
+    },
   );
-  return (res.data ?? []).map(normalise);
+  return (res.data ?? []).map(toTransaction);
 };
 
-// ── PUT /expense/v1/update ───────────────────────────────────────
-export const updateTransactionApi = async (
-  data: TransactionRequest,
-): Promise<Transaction> => {
-  const res = await apiClient.put<Transaction>('/expense/v1/update', data);
-  return res.data;
-};
-
-// ── DELETE /expense/v1/{userId}/{externalId} ─────────────────────
+// ── DELETE /expense/v1/deleteExpense ─────────────────────────────
 export const deleteTransactionApi = async (
   userId: string,
   externalId: string,
 ): Promise<void> => {
-  await apiClient.delete(`/expense/v1/${userId}/${externalId}`);
+  await apiClient.delete('/expense/v1/deleteExpense', {
+    headers: { 'X-User-Id': userId },
+    params: { externalId },
+  });
 };
-
-// ── Helpers ──────────────────────────────────────────────────────
-
-/**
- * If the backend does not return `transactionType`, infer it from
- * the category name so income items still display correctly.
- */
-const INCOME_CATEGORIES = [
-  'salary', 'freelance', 'investment', 'gift',
-  'other income', 'income',
-];
-
-function normalise(t: Transaction): Transaction {
-  if (t.transactionType) return t;
-  const lc = (t.category ?? '').toLowerCase();
-  const type = INCOME_CATEGORIES.some((c) => lc.includes(c))
-    ? 'INCOME'
-    : 'EXPENSE';
-  return { ...t, transactionType: type };
-}

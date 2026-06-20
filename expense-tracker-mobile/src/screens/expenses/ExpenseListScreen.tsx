@@ -7,13 +7,14 @@ import {
   TouchableOpacity,
   RefreshControl,
   TextInput,
+  Alert,
 } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Ionicons } from '@expo/vector-icons';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { Transaction, ExpenseStackParamList } from '../../types';
-import { getExpensesApi } from '../../api/expenseApi';
+import { getExpensesApi, deleteTransactionApi } from '../../api/expenseApi';
 import { useAuthStore } from '../../store/authStore';
 import COLORS from '../../constants/colors';
 import TransactionItem from '../../components/TransactionItem';
@@ -51,9 +52,13 @@ const ExpenseListScreen: React.FC<Props> = ({ navigation }) => {
   const totalExpense = expenses.reduce((s, t) => s + t.amount, 0);
   const currency = expenses[0]?.currency ?? 'USD';
 
-  const handleDelete = () => {
-    queryClient.invalidateQueries({ queryKey: ['transactions', userId] });
-  };
+  const deleteMutation = useMutation({
+    mutationFn: (externalId: string) => deleteTransactionApi(userId, externalId),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['transactions', userId] }),
+    onError: () => Alert.alert('Error', 'Could not delete the transaction. Please try again.'),
+  });
+
+  const handleDelete = (externalId: string) => deleteMutation.mutate(externalId);
 
   if (isLoading) return <LoadingSpinner message="Loading expenses..." />;
 

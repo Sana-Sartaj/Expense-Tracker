@@ -9,4 +9,4 @@
 -- already created the column before Flyway was enabled (Task 23).
 
 ALTER TABLE expense
-    ADD COLUMN IF NOT EXISTS is_deleted BOOLEAN NOT NULL DEFAULT FALSE;
+    ADD COLUMN is_deleted BOOLEAN NOT NULL DEFAULT FALSE;

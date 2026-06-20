@@ -21,6 +21,7 @@ import AnalyticsScreen from '../screens/analytics/AnalyticsScreen';
 import MoreScreen from '../screens/more/MoreScreen';
 import CategoryScreen from '../screens/categories/CategoryScreen';
 import BudgetScreen from '../screens/budget/BudgetScreen';
+import SmartAddScreen from '../screens/more/SmartAddScreen';
 
 // ── Stack navigators for tabs that need sub-screens ───────────────
 const ExpenseStack = createNativeStackNavigator<ExpenseStackParamList>();
@@ -67,6 +68,7 @@ const MoreNavigator = () => (
     <MoreStack.Screen name="MoreMenu" component={MoreScreen} options={{ title: 'More' }} />
     <MoreStack.Screen name="Categories" component={CategoryScreen} options={{ title: 'Categories' }} />
     <MoreStack.Screen name="Budget" component={BudgetScreen} options={{ title: 'Budget Tracker' }} />
+    <MoreStack.Screen name="SmartAdd" component={SmartAddScreen} options={{ title: 'Smart Import' }} />
   </MoreStack.Navigator>
 );
 
