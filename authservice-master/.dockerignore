@@ -1,0 +1,20 @@
+# Gradle caches — rebuilt inside the builder stage
+.gradle/
+app/.gradle/
+
+# Previous build outputs — rebuilt inside the builder stage
+build/
+app/build/
+
+# IDE and OS metadata
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+app/out/
+.DS_Store
+
+# Version control
+.git/
+.gitignore

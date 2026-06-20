@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <!--
+        springProperty pulls the value of spring.application.name at startup so it
+        appears in every log line.  The logback-spring.xml filename (not logback.xml)
+        is required for Spring Boot extensions (<springProperty>, <springProfile>) to work.
+    -->
+    <springProperty scope="context" name="SERVICE_NAME"
+                    source="spring.application.name" defaultValue="auth-service"/>
+
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <!--
+                %X{key} expands an MDC value set by LoggingFilter.
+                If the value is absent (e.g. non-HTTP threads) the placeholder is empty.
+            -->
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [${SERVICE_NAME}] [%thread] %logger{40} reqId=%X{requestId} userId=%X{userId} - %msg%n</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+
+    <!-- Application code: INFO so all business events are visible -->
+    <logger name="authservice" level="INFO"/>
+
+    <!-- Flyway: INFO to show migration progress without debug noise -->
+    <logger name="org.flywaydb" level="INFO"/>
+
+    <!--
+        Third-party frameworks: WARN in production.
+        All DEBUG/TRACE settings that were in application.properties are centralised here
+        so they can be overridden per-environment via logback-spring.xml profiles if needed.
+    -->
+    <logger name="org.springframework.security"  level="WARN"/>
+    <logger name="org.springframework.web"        level="WARN"/>
+    <logger name="org.springframework.kafka"      level="WARN"/>
+    <logger name="org.apache.kafka"               level="WARN"/>
+    <logger name="org.hibernate.SQL"              level="WARN"/>
+    <logger name="org.hibernate.type"             level="WARN"/>
+    <logger name="com.zaxxer.hikari"              level="WARN"/>
+
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+    </root>
+
+</configuration>
