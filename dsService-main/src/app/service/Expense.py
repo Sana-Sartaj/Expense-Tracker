@@ -1,5 +1,4 @@
 from typing import Optional
-from langchain_mistralai import ChatMistralAI
 from langchain_core.pydantic_v1 import BaseModel, Field
 
 class Expense(BaseModel):
@@ -12,5 +11,6 @@ class Expense(BaseModel):
         return {
             "amount": self.amount,
             "merchant": self.merchant,
-            "currency": self.currency
+            "currency": self.currency,
+            "transaction_type": "EXPENSE",
         }
